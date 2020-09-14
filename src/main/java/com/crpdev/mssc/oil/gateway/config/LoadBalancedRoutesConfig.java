@@ -26,8 +26,15 @@ public class LoadBalancedRoutesConfig {
                     .uri("lb://oil-order-service")
                 .   id("oil-order-service"))
                 .route(r -> r.path("/api/v1/oil/*/inventory")
+                        .filters(f -> f.circuitBreaker(c -> c.setName("inventory-circuit-breaker")
+                                                            .setFallbackUri("forward:/oil-inventory-failover")
+                                                            .setRouteId("inventory-failover")
+                        ))
                     .uri("lb://oil-inventory-service")
                     .id("oil-inventory-service"))
+                .route(r -> r.path("/oil-inventory-failover/**")
+                    .uri("lb://oil-inventory-failover")
+                    .id("oil-inventory-failover-service"))
                 .build();
     }
 }
