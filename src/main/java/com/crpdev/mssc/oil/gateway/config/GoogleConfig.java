@@ -19,7 +19,8 @@ public class GoogleConfig {
     @Bean
     public RouteLocator googleRouteConfig(RouteLocatorBuilder builder){
         return builder.routes()
-                .route(r -> r.path("/")
+                .route(r -> r.path("/googlesearch")
+                        .filters(f -> f.rewritePath("/googlesearch(?<segment>/?.*)", "/${segment}"))
                         .uri("https://www.google.com")
                         .id("google"))
                 .build();
