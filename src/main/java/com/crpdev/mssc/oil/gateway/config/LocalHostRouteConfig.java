@@ -8,32 +8,32 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * Created by rajapandian
- * Date: 14/09/20
+ * Date: 19/09/20
  * Project: mssc-oil-eureka
  * Package: com.crpdev.mssc.oil.gateway.config
  **/
-@Profile("local-discovery")
+@Profile("!local-discovery")
 @Configuration
-public class LoadBalancedRoutesConfig {
+public class LocalHostRouteConfig {
 
     @Bean
-    public RouteLocator loadBalancedRoutes(RouteLocatorBuilder builder){
+    public RouteLocator loadHostRoutes(RouteLocatorBuilder builder){
         return builder.routes()
                 .route(r-> r.path("/api/v1/oil*", "/api/v1/oil/*","/api/v1/oil/productCode/*")
-                    .uri("lb://oil-service")
-                    .id("oil-service"))
+                        .uri("http://localhost:8080")
+                        .id("oil-service"))
                 .route(r -> r.path("/api/v1/customers/**")
-                    .uri("lb://oil-order-service")
+                    .uri("http://localhost:8080")
                     .id("oil-order-service"))
                 .route(r -> r.path("/api/v1/oil/*/inventory")
                         .filters(f -> f.circuitBreaker(c -> c.setName("inventory-circuit-breaker")
                                                             .setFallbackUri("forward:/oil-inventory-failover")
-                                                            .setRouteId("oil-inventory-failover-service")
+                                                           .setRouteId("oil-inventory-failover")
                         ))
-                    .uri("lb://oil-inventory-service")
-                    .id("oil-inventory-service"))
+                   .uri("http://localhost:8080")
+                   .id("oil-inventory-service"))
                 .route(r -> r.path("/oil-inventory-failover/**")
-                    .uri("lb://oil-inventory-failover")
+                    .uri("http://localhost:8080")
                     .id("oil-inventory-failover-service"))
                 .build();
     }
