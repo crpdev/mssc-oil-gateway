@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
  * Project: mssc-oil-eureka
  * Package: com.crpdev.mssc.oil.gateway.config
  **/
-@Profile("local-discovery")
+@Profile({"local-discovery", "digitalocean"})
 @Configuration
 public class LoadBalancedRoutesConfig {
 
@@ -23,18 +23,18 @@ public class LoadBalancedRoutesConfig {
                     .uri("lb://oil-service")
                     .id("oil-service"))
                 .route(r -> r.path("/api/v1/customers/**")
-                    .uri("lb://oil-order-service")
-                    .id("oil-order-service"))
+                    .uri("lb://order-service")
+                    .id("order-service"))
                 .route(r -> r.path("/api/v1/oil/*/inventory")
                         .filters(f -> f.circuitBreaker(c -> c.setName("inventory-circuit-breaker")
-                                                            .setFallbackUri("forward:/oil-inventory-failover")
-                                                            .setRouteId("oil-inventory-failover-service")
+                                                            .setFallbackUri("forward:/inventory-failover")
+                                                            .setRouteId("inventory-failover-service")
                         ))
-                    .uri("lb://oil-inventory-service")
-                    .id("oil-inventory-service"))
-                .route(r -> r.path("/oil-inventory-failover/**")
-                    .uri("lb://oil-inventory-failover")
-                    .id("oil-inventory-failover-service"))
+                    .uri("lb://inventory-service")
+                    .id("inventory-service"))
+                .route(r -> r.path("/inventory-failover/**")
+                    .uri("lb://inventory-failover")
+                    .id("inventory-failover-service"))
                 .build();
     }
 }

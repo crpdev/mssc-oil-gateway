@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
  * Project: mssc-oil-eureka
  * Package: com.crpdev.mssc.oil.gateway.config
  **/
-@Profile("!local-discovery")
+@Profile("!local-discovery & !digitalocean")
 @Configuration
 public class LocalHostRouteConfig {
 
@@ -24,17 +24,17 @@ public class LocalHostRouteConfig {
                         .id("oil-service"))
                 .route(r -> r.path("/api/v1/customers/**")
                     .uri("http://localhost:8080")
-                    .id("oil-order-service"))
+                    .id("order-service"))
                 .route(r -> r.path("/api/v1/oil/*/inventory")
                         .filters(f -> f.circuitBreaker(c -> c.setName("inventory-circuit-breaker")
-                                                            .setFallbackUri("forward:/oil-inventory-failover")
-                                                           .setRouteId("oil-inventory-failover")
+                                                            .setFallbackUri("forward:/inventory-failover")
+                                                           .setRouteId("inventory-failover")
                         ))
                    .uri("http://localhost:8080")
-                   .id("oil-inventory-service"))
-                .route(r -> r.path("/oil-inventory-failover/**")
+                   .id("inventory-service"))
+                .route(r -> r.path("/inventory-failover/**")
                     .uri("http://localhost:8080")
-                    .id("oil-inventory-failover-service"))
+                    .id("inventory-failover-service"))
                 .build();
     }
 }
